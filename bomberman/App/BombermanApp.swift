@@ -2,11 +2,18 @@ import SwiftUI
 
 @main
 struct BombermanApp: App {
-    @StateObject private var socketService = WebSocketService()
+    private let socketService = WebSocketService()
+
+    @StateObject private var gameEngine: GameEngine
+
+    init() {
+        let engine = GameEngine(socketService: socketService)
+        _gameEngine = StateObject(wrappedValue: engine)
+    }
 
     var body: some Scene {
         WindowGroup {
-            GameView(gameEngine: GameEngine(socketService: socketService))
+            RootView(engine: gameEngine)
         }
     }
 }

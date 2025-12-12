@@ -5,12 +5,12 @@ struct GameView: View {
     @StateObject private var engine: GameEngine
     @State private var scene: GameScene
 
-    init(gameEngine: GameEngine) {
-        _engine = StateObject(wrappedValue: gameEngine)
+    init(engine: GameEngine) {
+        _engine = StateObject(wrappedValue: engine)
 
         let initialScene = GameScene()
         initialScene.scaleMode = .resizeFill
-        initialScene.engine = gameEngine
+        initialScene.engine = engine
         _scene = State(initialValue: initialScene)
     }
 
@@ -76,8 +76,4 @@ struct ControllerButton: View {
             .frame(width: 80, height: 80)
             .opacity(0.4)
     }
-}
-
-#Preview {
-    GameView(gameEngine: GameEngine(socketService: WebSocketService()))
 }

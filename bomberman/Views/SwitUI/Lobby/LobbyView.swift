@@ -1,25 +1,23 @@
 import SwiftUI
 
-struct LobbyView: View {
+struct LobbyView<ViewModel: LobbyViewModel>: View {
     
     // MARK: - Init
     
-    init(engine: GameEngine) {
-        self.engine = engine
+    init(viewModel: ViewModel) {
+        self.viewModel = viewModel
     }
     
     // MARK: - Body
     
     var body: some View {
-        VStack(spacing: 0.0) {
+        VStack(spacing: .zero) {
             VStack(spacing: 15.0) {
-                Text("ЛОББИ")
-                    .font(.pixelifySans(size: 40.0, fontWeight: .bold))
-                    .foregroundColor(.white)
+                header
 
                 ScrollView {
                     VStack(spacing: 12.0) {
-                        ForEach(engine.players) { player in
+                        ForEach(viewModel.players) { player in
                             HStack {
                                 Text(player.name)
                                     .font(.pixelifySans(size: 25.0, fontWeight: .bold))
@@ -35,7 +33,7 @@ struct LobbyView: View {
                             .background(Color.white.opacity(0.1))
                             .overlay(
                                 RoundedRectangle(cornerRadius: 12.0)
-                                    .stroke(player.id == engine.myPlayerId ? Color.yellow : Color.clear, lineWidth: 5.0)
+                                    .stroke(player.id == viewModel.myPlayerId ? Color.yellow : Color.clear, lineWidth: 5.0)
                             )
                             .cornerRadius(12.0)
                         }
@@ -45,12 +43,12 @@ struct LobbyView: View {
 
             Spacer()
 
-            if let me = engine.players.first(where: { $0.id == engine.myPlayerId }) {
+            if let me = viewModel.players.first(where: { $0.id == viewModel.myPlayerId }) {
                 Button(action: {
-                    engine.setReady()
+                    viewModel.setReady()
                 }) {
                     Text(me.ready == true ? "ОТМЕНА" : "Я ГОТОВ!")
-                        .font(.pixelifySans(size: 30.0, fontWeight: .bold))
+                        .font(.pixelifySans(size: 25.0, fontWeight: .bold))
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
                         .padding()
@@ -65,7 +63,36 @@ struct LobbyView: View {
     
     // MARK: - Private Properties
     
-    @ObservedObject private var engine: GameEngine
+    @ObservedObject private var viewModel: ViewModel
+    @State private var isSettingsPresented = false
+    
+    // MARK: - Private Views
+    
+    private var header: some View {
+        ZStack {
+            Text("ЛОББИ")
+                .font(.pixelifySans(size: 40.0, fontWeight: .bold))
+                .foregroundColor(.white)
+            
+            HStack {
+                Spacer()
+                
+                Button(
+                    action: {
+                        isSettingsPresented = true
+                    },
+                    label: {
+                        Images.Icons.settings_size24
+                            .renderingMode(.template)
+                            .foregroundStyle(.white)
+                    }
+                )
+            }
+        }
+        .fullScreenCover(isPresented: $isSettingsPresented) {
+            GameSettingsView(model: GameSettingsViewModelImpl()) // тут в идеале фабрику у GameSettingsView сделать и норм навигацию сделать
+        }
+    }
     
     // MARK: - Private Methods
     
@@ -78,3 +105,4 @@ struct LobbyView: View {
         }
     }
 }
+

@@ -1,18 +1,20 @@
 import SwiftUI
 import SpriteKit
 
-struct GameView: View {
-    @StateObject private var engine: GameEngine
-    @State private var scene: GameScene
-
-    init(engine: GameEngine) {
-        _engine = StateObject(wrappedValue: engine)
-
+struct GameplayView<ViewModel: GameplayViewModel>: View {
+    
+    // MARK: - Init
+    
+    init(viewModel: ViewModel) {
+        self.viewModel = viewModel
+        
         let initialScene = GameScene()
         initialScene.scaleMode = .resizeFill
-        initialScene.engine = engine
+        initialScene.engine = viewModel.engine
         _scene = State(initialValue: initialScene)
     }
+    
+    // MARK: - Body
 
     var body: some View {
         GeometryReader { geometry in
@@ -23,12 +25,12 @@ struct GameView: View {
                 SpriteView(scene: scene)
                     .onAppear {
                         scene.size = CGSize(width: geometry.size.width, height: geometry.size.height)
-                        scene.engine = self.engine
+                        scene.engine = viewModel.engine
                         scene.bindEngineEvents()
                         scene.updateVisuals()
                     }
-                    .onChange(of: engine.players) { _ in scene.updateVisuals() }
-                    .onChange(of: engine.bombs.count) { _ in scene.updateVisuals() }
+                    .onChange(of: viewModel.players) { _ in scene.updateVisuals() }
+                    .onChange(of: viewModel.bombs.count) { _ in scene.updateVisuals() }
 
                 VStack {
                     Spacer()
@@ -40,26 +42,43 @@ struct GameView: View {
             .ignoresSafeArea()
         }
     }
+    
+    // MARK: - Private Properties
+    
+    @ObservedObject private var viewModel: ViewModel
+    @State private var scene: GameScene
 
+    // MARK: - Private Views
+    
     private var controllerView: some View {
         HStack {
-            Button(action: { engine.placeBomb() }) { ControllerButton(imageName: "button_b") }
+            Button(action: { viewModel.placeBomb() }) {
+                ControllerButton(imageName: "button_b")
+            }
 
             Spacer()
 
             ZStack {
                 VStack(spacing: 0) {
-                    Button(action: { engine.movePlayer(dx: 0, dy: -1) }) { ControllerButton(imageName: "button_up") }
+                    Button(action: { viewModel.movePlayer(dx: 0, dy: -1) }) {
+                        ControllerButton(imageName: "button_up")
+                    }
 
                     Spacer().frame(width: 30, height: 30)
 
-                    Button(action: { engine.movePlayer(dx: 0, dy: 1) }) { ControllerButton(imageName: "button_down") }
+                    Button(action: { viewModel.movePlayer(dx: 0, dy: 1) }) {
+                        ControllerButton(imageName: "button_down")
+                    }
                 }
 
                 HStack(spacing: 0) {
-                    Button(action: { engine.movePlayer(dx: -1, dy: 0) }) { ControllerButton(imageName: "button_left") }
+                    Button(action: { viewModel.movePlayer(dx: -1, dy: 0) }) {
+                        ControllerButton(imageName: "button_left")
+                    }
                     Spacer().frame(width: 30, height: 30)
-                    Button(action: { engine.movePlayer(dx: 1, dy: 0) }) { ControllerButton(imageName: "button_right") }
+                    Button(action: { viewModel.movePlayer(dx: 1, dy: 0) }) {
+                        ControllerButton(imageName: "button_right")
+                    }
                 }
             }
         }
@@ -77,3 +96,4 @@ struct ControllerButton: View {
             .opacity(0.4)
     }
 }
+

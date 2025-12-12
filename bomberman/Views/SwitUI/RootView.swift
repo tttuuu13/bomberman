@@ -8,7 +8,17 @@
 import SwiftUI
 
 struct RootView: View {
-    @ObservedObject var engine: GameEngine
+    
+    // MARK: - Init
+    
+    init(engine: GameEngine) {
+        self.engine = engine
+        self._lobbyViewModel = StateObject(wrappedValue: LobbyViewModelImpl(engine: engine))
+        self._gameplayViewModel = StateObject(wrappedValue: GameplayViewModelImpl(engine: engine))
+        self._gameOverViewModel = StateObject(wrappedValue: GameOverViewModelImpl(engine: engine))
+    }
+    
+    // MARK: - Body
 
     var body: some View {
         ZStack {
@@ -22,17 +32,17 @@ struct RootView: View {
                 }
 
             case "WAITING":
-                LobbyView(engine: engine)
+                LobbyView(viewModel: lobbyViewModel)
 
             case "IN_PROGRESS":
-                GameView(engine: engine)
+                GameplayView(viewModel: gameplayViewModel)
 
             case "GAME_OVER":
                 ZStack {
-                    GameView(engine: engine)
+                    GameplayView(viewModel: gameplayViewModel)
                         .blur(radius: 10)
                         .disabled(true)
-                    GameOverView(engine: engine)
+                    GameOverView(viewModel: gameOverViewModel)
                 }
 
             default:
@@ -41,6 +51,13 @@ struct RootView: View {
         }
         .animation(.easeInOut, value: engine.gameState)
     }
+    
+    // MARK: - Private Properties
+    
+    @ObservedObject private var engine: GameEngine
+    @StateObject private var lobbyViewModel: LobbyViewModelImpl
+    @StateObject private var gameplayViewModel: GameplayViewModelImpl
+    @StateObject private var gameOverViewModel: GameOverViewModelImpl
 }
 
 

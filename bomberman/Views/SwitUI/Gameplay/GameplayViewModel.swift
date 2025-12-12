@@ -6,6 +6,7 @@ protocol GameplayViewModel: ObservableObject {
     var players: [PlayerModel] { get }
     var bombs: [BombModel] { get }
     var grid: [[TileType]] { get }
+    var gameState: String { get }
     var rows: Int { get }
     var cols: Int { get }
     var explosionEvents: PassthroughSubject<ExplosionPayload, Never> { get }
@@ -31,6 +32,7 @@ final class GameplayViewModelImpl: GameplayViewModel {
     @Published private(set) var players: [PlayerModel] = []
     @Published private(set) var bombs: [BombModel] = []
     @Published private(set) var grid: [[TileType]] = []
+    @Published private(set) var gameState: String = ""
     
     var rows: Int {
         _engine.rows
@@ -75,6 +77,10 @@ final class GameplayViewModelImpl: GameplayViewModel {
         _engine.$grid
             .receive(on: DispatchQueue.main)
             .assign(to: &$grid)
+        
+        _engine.$gameState
+            .receive(on: DispatchQueue.main)
+            .assign(to: &$gameState)
     }
 }
 

@@ -16,6 +16,7 @@ MIN_PLAYERS_TO_START = 2
 GAME_OVER_DURATION = 5
 ROUND_DURATION = 120 # 2 минуты
 ENDGAME_BOMB_CHANCE = 0.004 # Шанс спавна случайной бомбы в конце игры
+WIN_DELAY = 3 # Задержка перед завершением игры после смерти предпоследнего игрока
 
 # Глобальный словарь для хранения загруженных карт
 AVAILABLE_MAPS = {}
@@ -116,6 +117,7 @@ class Game:
         self.state = "WAITING"
         self.winner, self.game_over_time, self.round_start_time = None, None, None
         self.endgame_mode = False
+        self.win_check_time = None  # Время когда зафиксирована победа (для задержки)
         
         self.available_starts = self._find_start_positions()
         random.shuffle(self.available_starts)
@@ -192,12 +194,24 @@ class Game:
 
     def check_win_condition(self):
         alive_players = [p for p in self.players.values() if p.alive]
-        if self.state == "IN_PROGRESS" and len(alive_players) <= 1:
-            self.state = "GAME_OVER"
-            self.game_over_time = time.time()
-            self.endgame_mode = False
-            self.winner = alive_players[0].name if alive_players else "НИЧЬЯ"
-            print(f"--- ИГРА ОКОНЧЕНА! ПОБЕДИТЕЛЬ: {self.winner} ---")
+        
+        if self.state != "IN_PROGRESS":
+            return
+            
+        if len(alive_players) <= 1:
+            if self.win_check_time is None:
+                self.win_check_time = time.time()
+                print(f"--- Победа зафиксирована, ожидание {WIN_DELAY} сек для анимации... ---")
+            
+            if time.time() - self.win_check_time >= WIN_DELAY:
+                self.state = "GAME_OVER"
+                self.game_over_time = time.time()
+                self.endgame_mode = False
+                self.win_check_time = None
+                self.winner = alive_players[0].name if alive_players else "НИЧЬЯ"
+                print(f"--- ИГРА ОКОНЧЕНА! ПОБЕДИТЕЛЬ: {self.winner} ---")
+        else:
+            self.win_check_time = None
             
     def are_all_bricks_destroyed(self):
         return not any('.' in row for row in self.map)

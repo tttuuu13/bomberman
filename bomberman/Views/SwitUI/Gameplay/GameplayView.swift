@@ -29,6 +29,8 @@ struct GameplayView<ViewModel: GameplayViewModel>: View {
                         scene.bindEngineEvents()
                         scene.updateVisuals()
                     }
+                    .onChange(of: viewModel.gameState) { _ in scene.updateVisuals() }
+                    .onChange(of: viewModel.grid) { _ in scene.updateVisuals() }
                     .onChange(of: viewModel.players) { _ in scene.updateVisuals() }
                     .onChange(of: viewModel.bombs.count) { _ in scene.updateVisuals() }
 

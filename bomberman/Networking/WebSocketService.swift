@@ -3,8 +3,8 @@ import Combine
 
 class WebSocketService: ObservableObject {
     private var webSocketTask: URLSessionWebSocketTask?
-    // private let serverURL = URL(string: "ws://localhost:8765")!
-    private let serverURL = URL(string: "ws://192.168.1.2:8765")!
+    private let serverURL = URL(string: "ws://localhost:8765")!
+//    private let serverURL = URL(string: "ws://192.168.1.2:8765")!
 
     let messages = PassthroughSubject<String, Error>()
 

@@ -1,74 +1,80 @@
-//
-//  LobbyView.swift
-//  bomberman
-//
-//  Created by тимур on 12.12.2025.
-//
-
 import SwiftUI
 
 struct LobbyView: View {
-    @ObservedObject var engine: GameEngine
-
+    
+    // MARK: - Init
+    
+    init(engine: GameEngine) {
+        self.engine = engine
+    }
+    
+    // MARK: - Body
+    
     var body: some View {
-        VStack(spacing: 30) {
-            Text("ЛОББИ")
-                .font(.system(size: 40, weight: .heavy))
-                .foregroundColor(.white)
-                .padding(.top, 50)
+        VStack(spacing: 0.0) {
+            VStack(spacing: 15.0) {
+                Text("ЛОББИ")
+                    .font(.pixelifySans(size: 40.0, fontWeight: .bold))
+                    .foregroundColor(.white)
 
-            // Список игроков
-            ScrollView {
-                VStack(spacing: 12) {
-                    ForEach(engine.players) { player in
-                        HStack {
-                            Text(player.name)
-                                .font(.title3)
-                                .fontWeight(.bold)
-                                .foregroundColor(.white)
+                ScrollView {
+                    VStack(spacing: 12.0) {
+                        ForEach(engine.players) { player in
+                            HStack {
+                                Text(player.name)
+                                    .font(.pixelifySans(size: 25.0, fontWeight: .bold))
+                                    .foregroundColor(.white)
 
-                            Spacer()
+                                Spacer()
 
-                            if player.ready == true {
-                                Text("ГОТОВ")
-                                    .foregroundColor(.green)
-                                    .fontWeight(.bold)
-                            } else {
-                                Text("ЖДЕМ...")
-                                    .foregroundColor(.gray)
+                                playerStateView(isReady: player.ready)
+                                    .font(.pixelifySans(size: 25.0, fontWeight: .bold))
+                                    .foregroundColor(.white)
                             }
+                            .padding()
+                            .background(Color.white.opacity(0.1))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12.0)
+                                    .stroke(player.id == engine.myPlayerId ? Color.yellow : Color.clear, lineWidth: 5.0)
+                            )
+                            .cornerRadius(12.0)
                         }
-                        .padding()
-                        .background(Color.white.opacity(0.1))
-                        .cornerRadius(12)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 12)
-                                .stroke(player.id == engine.myPlayerId ? Color.yellow : Color.clear, lineWidth: 2)
-                        )
                     }
                 }
-                .padding(.horizontal)
             }
 
             Spacer()
 
-            // Кнопка готовности (только для себя)
             if let me = engine.players.first(where: { $0.id == engine.myPlayerId }) {
                 Button(action: {
                     engine.setReady()
                 }) {
                     Text(me.ready == true ? "ОТМЕНА" : "Я ГОТОВ!")
-                        .font(.title2)
-                        .fontWeight(.bold)
+                        .font(.pixelifySans(size: 30.0, fontWeight: .bold))
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
                         .padding()
                         .background(me.ready == true ? Color.red : Color.green)
                         .cornerRadius(15)
                 }
-                .padding(.horizontal, 40)
-                .padding(.bottom, 30)
             }
+        }
+        .padding(.vertical, 15.0)
+        .padding(.horizontal, 40.0)
+    }
+    
+    // MARK: - Private Properties
+    
+    @ObservedObject private var engine: GameEngine
+    
+    // MARK: - Private Methods
+    
+    @ViewBuilder
+    private func playerStateView(isReady: Bool?) -> some View {
+        if isReady == true {
+            Text("ГОТОВ")
+        } else {
+            Text("ЖДЕМ...")
         }
     }
 }

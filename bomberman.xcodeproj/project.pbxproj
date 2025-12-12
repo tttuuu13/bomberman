@@ -10,9 +10,22 @@
 		3902A5432EE5CF8800426BBE /* bomberman.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = bomberman.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		C4FBE6F02EEC985700E15C13 /* Exceptions for "bomberman" folder in "bomberman" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 3902A5422EE5CF8800426BBE /* bomberman */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		3902A5452EE5CF8800426BBE /* bomberman */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				C4FBE6F02EEC985700E15C13 /* Exceptions for "bomberman" folder in "bomberman" target */,
+			);
 			path = bomberman;
 			sourceTree = "<group>";
 		};
@@ -256,6 +269,7 @@
 				DEVELOPMENT_TEAM = W9P5JL4539;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = bomberman/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -288,6 +302,7 @@
 				DEVELOPMENT_TEAM = W9P5JL4539;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = bomberman/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

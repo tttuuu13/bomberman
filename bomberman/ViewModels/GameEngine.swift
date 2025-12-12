@@ -37,6 +37,7 @@ class GameEngine: ObservableObject {
     }
 
     private func handleServerMessage(jsonString: String) {
+        print(jsonString)
         guard let data = jsonString.data(using: .utf8) else { return }
 
         do {

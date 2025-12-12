@@ -12,6 +12,10 @@ class GameEngine: ObservableObject {
     private var socket: WebSocketService
     private var cancellables = Set<AnyCancellable>()
     let explosionEvents = PassthroughSubject<ExplosionPayload, Never>()
+    let mapResetEvent = PassthroughSubject<Void, Never>()
+    
+    private var previousGameState: String = ""
+    @Published var roundId: Int = 0 
 
     var rows: Int = 0
     var cols: Int = 0
@@ -73,8 +77,17 @@ class GameEngine: ObservableObject {
                let state = wrapper.payload {
                 self.players = state.players
                 self.bombs = state.bombs
+                
+                let isNewRound = state.state == "IN_PROGRESS" && previousGameState != "IN_PROGRESS"
+                previousGameState = state.state
+                
                 self.gameState = state.state
                 parseMap(from: state.map)
+                
+                if isNewRound {
+                    roundId += 1
+                    mapResetEvent.send()
+                }
             }
         default:
             break

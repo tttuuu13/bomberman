@@ -36,12 +36,14 @@ struct RootView: View {
 
             case "IN_PROGRESS":
                 GameplayView(viewModel: gameplayViewModel)
+                    .id("gameplay_round_\(engine.roundId)")
 
             case "GAME_OVER":
                 ZStack {
                     GameplayView(viewModel: gameplayViewModel)
                         .blur(radius: 10)
                         .disabled(true)
+                        .id("gameplay_round_\(engine.roundId)_gameover")
                     GameOverView(viewModel: gameOverViewModel)
                 }
 

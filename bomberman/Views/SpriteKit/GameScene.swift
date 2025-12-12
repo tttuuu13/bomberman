@@ -20,6 +20,8 @@ class GameScene: SKScene {
     private var tileSize: CGFloat = 0
     private var mapOffset: CGPoint = .zero
     private let perspectiveFactor: CGFloat = 0.8
+    
+    private var lastBuiltRoundId: Int = -1
 
     private let worldNode = SKNode()
 
@@ -95,12 +97,43 @@ class GameScene: SKScene {
     }
 
     func bindEngineEvents() {
+        cancellables.removeAll()
+        
         engine?.explosionEvents
             .receive(on: DispatchQueue.main)
             .sink { [weak self] payload in
                 self?.handleExplosion(payload: payload)
             }
             .store(in: &cancellables)
+        
+        engine?.mapResetEvent
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.forceRebuildMap()
+            }
+            .store(in: &cancellables)
+        
+        engine?.$gameState
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] newState in
+                if newState == "IN_PROGRESS" {
+                    self?.forceRebuildMap()
+                }
+            }
+            .store(in: &cancellables)
+    }
+    
+    func forceRebuildMap() {
+        guard let engine = engine, engine.rows > 0, engine.cols > 0, let view = self.view else { return }
+        
+        let mapIsEmpty = tileNodes.isEmpty || worldNode.children.isEmpty
+        guard mapIsEmpty || lastBuiltRoundId != engine.roundId else { return }
+        lastBuiltRoundId = engine.roundId
+        
+        calculateSceneDimensions(view: view)
+        setupMap()
+        updatePlayers()
+        updateBombs()
     }
 
     func updateVisuals() {
@@ -111,6 +144,7 @@ class GameScene: SKScene {
             calculateSceneDimensions(view: view)
             setupMap()
         }
+        
         updateMap()
         updatePlayers()
         updateBombs()

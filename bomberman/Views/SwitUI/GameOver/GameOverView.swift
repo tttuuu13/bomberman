@@ -1,14 +1,14 @@
-//
-//  GameOverView.swift
-//  bomberman
-//
-//  Created by тимур on 12.12.2025.
-//
-
 import SwiftUI
 
-struct GameOverView: View {
-    @ObservedObject var engine: GameEngine
+struct GameOverView<ViewModel: GameOverViewModel>: View {
+    
+    // MARK: - Init
+    
+    init(viewModel: ViewModel) {
+        self.viewModel = viewModel
+    }
+    
+    // MARK: - Body
 
     var body: some View {
         ZStack {
@@ -16,25 +16,24 @@ struct GameOverView: View {
 
             VStack(spacing: 20) {
                 Text("РАУНД ЗАВЕРШЕН")
-                    .font(.title)
-                    .fontWeight(.bold)
+                    .font(.pixelifySans(size: 40.0, fontWeight: .bold))
                     .foregroundColor(.white)
 
-                if let winner = engine.players.first(where: { $0.alive }) {
+                if let winner = viewModel.winner {
                     Text("Победитель:")
-                        .font(.headline)
+                        .font(.pixelifySans(size: 20.0, fontWeight: .bold))
                         .foregroundColor(.gray)
                     Text(winner.name)
-                        .font(.system(size: 50, weight: .heavy))
+                        .font(.pixelifySans(size: 50.0, fontWeight: .bold))
                         .foregroundColor(.yellow)
                 } else {
                     Text("НИЧЬЯ")
-                        .font(.system(size: 50, weight: .heavy))
+                        .font(.pixelifySans(size: 50.0, fontWeight: .bold))
                         .foregroundColor(.gray)
                 }
 
                 Text("Ожидание нового раунда...")
-                    .font(.caption)
+                    .font(.pixelifySans(size: 15.0, fontWeight: .bold))
                     .foregroundColor(.white.opacity(0.7))
                     .padding(.top, 20)
             }
@@ -44,4 +43,8 @@ struct GameOverView: View {
             .shadow(radius: 20)
         }
     }
+    
+    // MARK: - Private Properties
+    
+    @ObservedObject private var viewModel: ViewModel
 }

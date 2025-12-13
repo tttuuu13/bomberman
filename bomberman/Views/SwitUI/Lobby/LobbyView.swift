@@ -47,7 +47,7 @@ struct LobbyView<ViewModel: LobbyViewModel>: View {
 
                 if let me = viewModel.players.first(where: { $0.id == viewModel.myPlayerId }) {
                     let canReady = viewModel.players.count >= 2
-                    
+
                     Button(action: {
                         if canReady {
                             viewModel.setReady()
@@ -64,22 +64,22 @@ struct LobbyView<ViewModel: LobbyViewModel>: View {
                     }
                     .disabled(!canReady)
                 }
-            }
-            .padding(.vertical, 15.0)
-            .padding(.horizontal, 40.0)
-            .blur(radius: viewModel.isReconnecting ? 5 : 0)
-            
-            if viewModel.isReconnecting {
-                VStack(spacing: 20) {
-                    ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                        .scaleEffect(2)
-                    Text("Переподключение...")
-                        .font(.pixelifySans(size: 25.0, fontWeight: .bold))
-                        .foregroundColor(.white)
+                .padding(.vertical, 15.0)
+                .padding(.horizontal, 40.0)
+                .blur(radius: viewModel.isReconnecting ? 5 : 0)
+
+                if viewModel.isReconnecting {
+                    VStack(spacing: 20) {
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                            .scaleEffect(2)
+                        Text("Переподключение...")
+                            .font(.pixelifySans(size: 25.0, fontWeight: .bold))
+                            .foregroundColor(.white)
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(Color.black.opacity(0.7))
                 }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(Color.black.opacity(0.7))
             }
         }
     }

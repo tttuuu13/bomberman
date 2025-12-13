@@ -1,5 +1,6 @@
 import SwiftUI
 import SpriteKit
+import UIKit
 
 struct GameplayView<ViewModel: GameplayViewModel>: View {
     
@@ -35,14 +36,37 @@ struct GameplayView<ViewModel: GameplayViewModel>: View {
                     .onChange(of: viewModel.bombs.count) { _ in scene.updateVisuals() }
 
                 VStack {
+                    if viewModel.gameState == "IN_PROGRESS", let time = viewModel.timeRemaining {
+                        timerView(time: Int(time))
+                    }
+                    
                     Spacer()
-                    controllerView
+                    
+                    if viewModel.isCurrentPlayerAlive {
+                        controllerView
+                    }
+                    
+                    if viewModel.shouldShowSpectatorBadge {
+                        spectatorBadge
+                    }
                 }
                 .padding(.vertical, 20)
                 .padding(.horizontal, 50)
             }
             .ignoresSafeArea()
+            .onChange(of: viewModel.isCurrentPlayerAlive) { isAlive in
+                if !isAlive {
+                    triggerDeathHaptic()
+                }
+            }
         }
+    }
+    
+    // MARK: - Private Methods
+    
+    private func triggerDeathHaptic() {
+        let generator = UINotificationFeedbackGenerator()
+        generator.notificationOccurred(.error)
     }
     
     // MARK: - Private Properties
@@ -51,6 +75,39 @@ struct GameplayView<ViewModel: GameplayViewModel>: View {
     @State private var scene: GameScene
 
     // MARK: - Private Views
+    
+    private func timerView(time: Int) -> some View {
+        let isExpired = time <= 0
+        
+        return Text(String(time))
+            .font(.custom("PixelifySans-Bold", size: 28))
+            .foregroundColor(isExpired ? .red : .white)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 8)
+            .shadow(color: .black.opacity(0.3), radius: 6, x: 0, y: 3)
+    }
+    
+    private var spectatorBadge: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "eye.fill")
+                .font(.system(size: 16, weight: .semibold))
+            
+            Text("SPECTATOR")
+                .font(.custom("PixelifySans-SemiBold", size: 18))
+        }
+        .foregroundColor(.white)
+        .padding(.horizontal, 20)
+        .padding(.vertical, 10)
+        .background(
+            Capsule()
+                .fill(Color.black.opacity(0.6))
+                .overlay(
+                    Capsule()
+                        .strokeBorder(Color.white.opacity(0.3), lineWidth: 1)
+                )
+        )
+        .shadow(color: .black.opacity(0.3), radius: 8, x: 0, y: 4)
+    }
     
     private var controllerView: some View {
         HStack {

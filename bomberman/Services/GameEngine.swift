@@ -7,6 +7,7 @@ class GameEngine: ObservableObject {
     @Published var bombs: [BombModel] = []
     @Published var gameState: String = "CONNECTING"
     @Published var isReconnecting: Bool = false
+    @Published var timeRemaining: Double? = nil
 
     var myPlayerId: String?
 
@@ -145,6 +146,7 @@ class GameEngine: ObservableObject {
                 let oldState = self.gameState
                 self.players = state.players
                 self.bombs = state.bombs
+                self.timeRemaining = state.time_remaining
                 
                 let isNewRound = state.state == "IN_PROGRESS" && previousGameState != "IN_PROGRESS"
                 previousGameState = state.state

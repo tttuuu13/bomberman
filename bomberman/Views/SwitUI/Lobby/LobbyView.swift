@@ -46,8 +46,12 @@ struct LobbyView<ViewModel: LobbyViewModel>: View {
                 Spacer()
 
                 if let me = viewModel.players.first(where: { $0.id == viewModel.myPlayerId }) {
+                    let canReady = viewModel.players.count >= 2
+                    
                     Button(action: {
-                        viewModel.setReady()
+                        if canReady {
+                            viewModel.setReady()
+                        }
                     }) {
                         Text(me.ready == true ? "ОТМЕНА" : "Я ГОТОВ!")
                             .font(.pixelifySans(size: 25.0, fontWeight: .bold))
@@ -55,9 +59,10 @@ struct LobbyView<ViewModel: LobbyViewModel>: View {
                             .frame(maxWidth: .infinity)
                             .padding(.horizontal, 16)
                             .padding(.vertical, 16)
-                            .background(me.ready == true ? Color.red : Color.green)
+                            .background(canReady ? (me.ready == true ? Color.red : Color.green) : Color.gray)
                             .cornerRadius(15)
                     }
+                    .disabled(!canReady)
                 }
             }
             .padding(.vertical, 15.0)

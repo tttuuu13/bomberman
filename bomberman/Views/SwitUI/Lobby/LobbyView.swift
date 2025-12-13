@@ -30,7 +30,8 @@ struct LobbyView<ViewModel: LobbyViewModel>: View {
                                         .font(.pixelifySans(size: 25.0, fontWeight: .bold))
                                         .foregroundColor(.white)
                                 }
-                                .padding()
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 12)
                                 .background(Color.white.opacity(0.1))
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 12.0)
@@ -52,7 +53,8 @@ struct LobbyView<ViewModel: LobbyViewModel>: View {
                             .font(.pixelifySans(size: 25.0, fontWeight: .bold))
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
-                            .padding()
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 16)
                             .background(me.ready == true ? Color.red : Color.green)
                             .cornerRadius(15)
                     }
@@ -62,7 +64,6 @@ struct LobbyView<ViewModel: LobbyViewModel>: View {
             .padding(.horizontal, 40.0)
             .blur(radius: viewModel.isReconnecting ? 5 : 0)
             
-            // Индикатор загрузки при переподключении
             if viewModel.isReconnecting {
                 VStack(spacing: 20) {
                     ProgressView()

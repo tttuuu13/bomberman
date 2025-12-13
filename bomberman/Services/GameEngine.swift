@@ -217,9 +217,7 @@ class GameEngine: ObservableObject {
             
             let defaults = UserDefaults.standard
             let playerName = defaults.string(forKey: "playerName") ?? "Player\(Int.random(in: 1000...9999))"
-            print("═══════════════════════════════════════")
             print("Начинаем переподключение с именем: \(playerName)")
-            print("═══════════════════════════════════════")
             
             self.setupSocketSubscription()
             

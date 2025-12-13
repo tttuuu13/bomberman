@@ -145,14 +145,6 @@ final class GameSettingsViewModelImpl: GameSettingsViewModel {
         _initialColorRed = colorRed
         _initialColorGreen = colorGreen
         _initialColorBlue = colorBlue
-        
-        print("═══════════════════════════════════════")
-        print("saveInitialName вызван:")
-        print("  - Сохранено начальное имя: '\(_initialPlayerName)'")
-        print("  - Сохранен начальный цвет: R=\(_initialColorRed), G=\(_initialColorGreen), B=\(_initialColorBlue)")
-        print("  - Текущее имя из @AppStorage: '\(playerName)'")
-        print("  - Текущий цвет из @AppStorage: R=\(colorRed), G=\(colorGreen), B=\(colorBlue)")
-        print("═══════════════════════════════════════")
     }
     
     func onDismiss() {
@@ -165,32 +157,10 @@ final class GameSettingsViewModelImpl: GameSettingsViewModel {
         
         let nameChanged = initialNameTrimmed != currentName
         
-        print("═══════════════════════════════════════")
-        print("onDismiss - детальное сравнение:")
-        print("  - Начальное имя (raw): '\(initialNameRaw)'")
-        print("  - Начальное имя (trimmed): '\(initialNameTrimmed)'")
-        print("  - Текущее имя (raw): '\(currentNameRaw)'")
-        print("  - Текущее имя (trimmed): '\(currentName)'")
-        print("  - Сравнение: '\(initialNameTrimmed)' == '\(currentName)' -> \(initialNameTrimmed == currentName)")
-        print("  - Имя изменилось: \(nameChanged)")
-        
         let colorRedChanged = abs(colorRed - _initialColorRed) >= 0.01
         let colorGreenChanged = abs(colorGreen - _initialColorGreen) >= 0.01
         let colorBlueChanged = abs(colorBlue - _initialColorBlue) >= 0.01
         let colorChanged = colorRedChanged || colorGreenChanged || colorBlueChanged
-        
-        print("═══════════════════════════════════════")
-        print("onDismiss:")
-        print("  - Начальное имя: '\(initialNameTrimmed)' (длина: \(initialNameTrimmed.count))")
-        print("  - Текущее имя: '\(currentName)' (длина: \(currentName.count))")
-        print("  - Имена равны: \(initialNameTrimmed == currentName)")
-        print("  - Начальный цвет: R=\(_initialColorRed), G=\(_initialColorGreen), B=\(_initialColorBlue)")
-        print("  - Текущий цвет: R=\(colorRed), G=\(colorGreen), B=\(colorBlue)")
-        print("  - Изменения цвета: R=\(colorRedChanged), G=\(colorGreenChanged), B=\(colorBlueChanged)")
-        print("  - Имя изменилось: \(nameChanged)")
-        print("  - Цвет изменился: \(colorChanged)")
-        print("  - Engine существует: \(engine != nil)")
-        print("  - Состояние игры: \(engine?.gameState ?? "engine is nil")")
         
         if nameChanged || colorChanged {
             if !currentName.isEmpty {
@@ -211,12 +181,7 @@ final class GameSettingsViewModelImpl: GameSettingsViewModel {
                     print("✓ Цвет изменился - переподключаемся к игре")
                 }
                 engine.reconnectWithNewName()
-            } else {
-                print("✗ Engine отсутствует, переподключение невозможно")
             }
-        } else {
-            print("✗ Имя и цвет НЕ изменились - переподключение НЕ требуется")
         }
-        print("═══════════════════════════════════════")
     }
 }

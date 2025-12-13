@@ -46,7 +46,8 @@ struct GameSettingsView: View {
                             TextField("Введите имя", text: $model.playerName)
                                 .font(.pixelifySans(size: 25.0, fontWeight: .regular))
                                 .foregroundColor(.white)
-                                .padding()
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 12)
                                 .background(Color.white.opacity(0.1))
                                 .cornerRadius(12)
                                 .overlay(
@@ -68,7 +69,8 @@ struct GameSettingsView: View {
                                 Text(model.playerName.isEmpty ? "Игрок" : model.playerName)
                                     .font(.pixelifySans(size: 25.0, fontWeight: .bold))
                                     .foregroundColor(.white)
-                                    .padding()
+                                    .padding(.horizontal, 16)
+                                    .padding(.vertical, 12)
                                     .frame(maxWidth: .infinity)
                                     .background(model.playerColor.opacity(0.3))
                                     .overlay(

@@ -16,6 +16,27 @@ struct JoinMessage: Encodable {
     let type = "join"
     let role: String
     let name: String
+    let color: ColorData?
+    
+    enum CodingKeys: String, CodingKey {
+        case type, role, name, color
+    }
+    
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(type, forKey: .type)
+        try container.encode(role, forKey: .role)
+        try container.encode(name, forKey: .name)
+        if let color = color {
+            try container.encode(color, forKey: .color)
+        }
+    }
+}
+
+struct ColorData: Codable, Equatable {
+    let red: Double
+    let green: Double
+    let blue: Double
 }
 
 
@@ -62,6 +83,7 @@ struct PlayerModel: Decodable, Identifiable, Equatable {
     let name: String
     let alive: Bool
     let ready: Bool?
+    let color: ColorData?
 }
 
 struct BombModel: Decodable, Identifiable, Equatable {

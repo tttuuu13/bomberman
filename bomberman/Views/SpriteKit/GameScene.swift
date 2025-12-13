@@ -273,18 +273,15 @@ class GameScene: SKScene {
 
             if let existing = playerNodes[player.id] {
                 node = existing
-                // Всегда обновляем цвет для текущего игрока при каждом обновлении
-                if let myPlayerId = engine.myPlayerId, player.id == myPlayerId {
-                    let newColor = getColor(for: player.id)
-                    node.color = newColor
-                    node.colorBlendFactor = 0.3
-                }
+                let newColor = getColor(for: player)
+                node.color = newColor
+                node.colorBlendFactor = 0.3
             } else {
                 let newNode = SKSpriteNode()
                 newNode.size = CGSize(width: tileSize * 2.5, height: tileSize * 2.5)
                 newNode.anchorPoint = CGPoint(x: 0.5, y: 0.2)
                 newNode.position = gridPositionForBase(col: player.x, row: player.y)
-                newNode.color = getColor(for: player.id)
+                newNode.color = getColor(for: player)
                 newNode.colorBlendFactor = 0.3
                 worldNode.addChild(newNode)
                 playerNodes[player.id] = newNode
@@ -442,19 +439,12 @@ class GameScene: SKScene {
         return CGPoint(x: x, y: y)
     }
 
-    private func getColor(for playerId: String) -> UIColor {
-        // Если это текущий игрок, используем сохраненный цвет
-        if let myPlayerId = engine?.myPlayerId, playerId == myPlayerId {
-            let defaults = UserDefaults.standard
-            // Если цвет еще не установлен, используем значения по умолчанию (красный)
-            let red = defaults.object(forKey: "playerColorRed") as? Double ?? 1.0
-            let green = defaults.object(forKey: "playerColorGreen") as? Double ?? 0.0
-            let blue = defaults.object(forKey: "playerColorBlue") as? Double ?? 0.0
-            return UIColor(red: red, green: green, blue: blue, alpha: 1.0)
+    private func getColor(for player: PlayerModel) -> UIColor {
+        if let color = player.color {
+            return UIColor(red: color.red, green: color.green, blue: color.blue, alpha: 1.0)
         }
         
-        // Для других игроков генерируем цвет по ID
-        let hash = playerId.utf8.reduce(0) { $0 + Int($1) }
+        let hash = player.id.utf8.reduce(0) { $0 + Int($1) }
 
         let colors: [UIColor] = [
             .red,

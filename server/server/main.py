@@ -48,12 +48,13 @@ def load_maps():
 
 # --- Игровые классы ---
 class Player:
-    def __init__(self, id, name, start_x, start_y):
+    def __init__(self, id, name, start_x, start_y, color=None):
         self.id, self.name = id, name
         self.start_x, self.start_y = start_x, start_y
         self.x, self.y = start_x, start_y
         self.alive = True
         self.ready = False
+        self.color = color
 
     def move(self, dx, dy, game):
         if not self.alive: return
@@ -77,7 +78,10 @@ class Player:
         self.ready = False
 
     def to_dict(self):
-        return {"id": self.id, "name": self.name, "x": self.x, "y": self.y, "alive": self.alive, "ready": self.ready}
+        result = {"id": self.id, "name": self.name, "x": self.x, "y": self.y, "alive": self.alive, "ready": self.ready}
+        if self.color:
+            result["color"] = self.color
+        return result
 
 class Bomb:
     def __init__(self, x, y):
@@ -155,7 +159,7 @@ class Game:
         
         print(f"--- Очищены зоны спавна для {len(spawn_positions)} точек ---")
 
-    def add_player(self, player_id, player_name):
+    def add_player(self, player_id, player_name, color=None):
         all_starts = self._find_start_positions()
         taken_starts = {(p.start_x, p.start_y) for p in self.players.values()}
         free_starts = [pos for pos in all_starts if pos not in taken_starts]
@@ -165,7 +169,7 @@ class Game:
             return None
             
         start_pos = free_starts[0]
-        player = Player(player_id, player_name, start_pos[0], start_pos[1])
+        player = Player(player_id, player_name, start_pos[0], start_pos[1], color=color)
         self.players[player_id] = player
         print(f"Игрок '{player_name}' ({player_id}) добавлен на {start_pos}")
         return player
@@ -353,9 +357,17 @@ async def handler(websocket):
             role = data.get("role", "player")
             if role == "player":
                 player_name = data.get("name", "Аноним")
+                color_data = data.get("color")
+                color = None
+                if color_data:
+                    color = {
+                        "red": color_data.get("red", 1.0),
+                        "green": color_data.get("green", 0.0),
+                        "blue": color_data.get("blue", 0.0)
+                    }
                 client_id = str(uuid.uuid4())
                 
-                if GAME.add_player(client_id, player_name) is None:
+                if GAME.add_player(client_id, player_name, color=color) is None:
                     await websocket.close(code=1008, reason="Server is full")
                     print(f"Отклонено подключение для '{player_name}': сервер полон.")
                     return

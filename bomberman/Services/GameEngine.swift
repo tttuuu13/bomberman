@@ -82,7 +82,13 @@ class GameEngine: ObservableObject {
                 return
             }
             
-            let joinMsg = JoinMessage(role: "player", name: name)
+            let defaults = UserDefaults.standard
+            let colorRed = defaults.object(forKey: "playerColorRed") as? Double ?? 1.0
+            let colorGreen = defaults.object(forKey: "playerColorGreen") as? Double ?? 0.0
+            let colorBlue = defaults.object(forKey: "playerColorBlue") as? Double ?? 0.0
+            let color = ColorData(red: colorRed, green: colorGreen, blue: colorBlue)
+            
+            let joinMsg = JoinMessage(role: "player", name: name, color: color)
             print("Попытка \(attempt)/\(maxAttempts) отправки join сообщения с именем: \(name)")
             
             if let data = try? JSONEncoder().encode(joinMsg),

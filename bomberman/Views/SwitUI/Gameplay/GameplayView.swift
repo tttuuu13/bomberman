@@ -1,5 +1,6 @@
 import SwiftUI
 import SpriteKit
+import UIKit
 
 struct GameplayView<ViewModel: GameplayViewModel>: View {
     
@@ -35,6 +36,10 @@ struct GameplayView<ViewModel: GameplayViewModel>: View {
                     .onChange(of: viewModel.bombs.count) { _ in scene.updateVisuals() }
 
                 VStack {
+                    if viewModel.gameState == "IN_PROGRESS", let time = viewModel.timeRemaining {
+                        timerView(time: Int(time))
+                    }
+                    
                     Spacer()
                     
                     if viewModel.isCurrentPlayerAlive {
@@ -43,15 +48,25 @@ struct GameplayView<ViewModel: GameplayViewModel>: View {
                     
                     if viewModel.shouldShowSpectatorBadge {
                         spectatorBadge
-                            .transition(.move(edge: .bottom).combined(with: .opacity))
                     }
                 }
                 .padding(.vertical, 20)
                 .padding(.horizontal, 50)
-                .animation(.easeInOut(duration: 0.3), value: viewModel.isCurrentPlayerAlive)
             }
             .ignoresSafeArea()
+            .onChange(of: viewModel.isCurrentPlayerAlive) { isAlive in
+                if !isAlive {
+                    triggerDeathHaptic()
+                }
+            }
         }
+    }
+    
+    // MARK: - Private Methods
+    
+    private func triggerDeathHaptic() {
+        let generator = UINotificationFeedbackGenerator()
+        generator.notificationOccurred(.error)
     }
     
     // MARK: - Private Properties
@@ -60,6 +75,17 @@ struct GameplayView<ViewModel: GameplayViewModel>: View {
     @State private var scene: GameScene
 
     // MARK: - Private Views
+    
+    private func timerView(time: Int) -> some View {
+        let isExpired = time <= 0
+        
+        return Text(String(time))
+            .font(.custom("PixelifySans-Bold", size: 28))
+            .foregroundColor(isExpired ? .red : .white)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 8)
+            .shadow(color: .black.opacity(0.3), radius: 6, x: 0, y: 3)
+    }
     
     private var spectatorBadge: some View {
         HStack(spacing: 8) {

@@ -15,6 +15,7 @@ protocol GameplayViewModel: ObservableObject {
     
     var isCurrentPlayerAlive: Bool { get }
     var shouldShowSpectatorBadge: Bool { get }
+    var timeRemaining: Double? { get }
     
     func movePlayer(dx: Int, dy: Int)
     func placeBomb()
@@ -38,6 +39,7 @@ final class GameplayViewModelImpl: GameplayViewModel {
     @Published private(set) var gameState: String = ""
     @Published private(set) var isCurrentPlayerAlive: Bool = true
     @Published private(set) var shouldShowSpectatorBadge: Bool = false
+    @Published private(set) var timeRemaining: Double? = nil
     
     var rows: Int {
         _engine.rows
@@ -91,6 +93,14 @@ final class GameplayViewModelImpl: GameplayViewModel {
         _engine.$gameState
             .receive(on: DispatchQueue.main)
             .assign(to: &$gameState)
+        
+        _engine.$timeRemaining
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] time in
+                // Не даём времени уйти в минус — останавливаем на 0
+                self?.timeRemaining = time.map { max(0, $0) }
+            }
+            .store(in: &cancellables)
     }
     
     private func updateSpectatorState(players: [PlayerModel]) {

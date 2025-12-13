@@ -13,6 +13,9 @@ protocol GameplayViewModel: ObservableObject {
     
     var engine: GameEngine { get }
     
+    var isCurrentPlayerAlive: Bool { get }
+    var shouldShowSpectatorBadge: Bool { get }
+    
     func movePlayer(dx: Int, dy: Int)
     func placeBomb()
 }
@@ -33,6 +36,8 @@ final class GameplayViewModelImpl: GameplayViewModel {
     @Published private(set) var bombs: [BombModel] = []
     @Published private(set) var grid: [[TileType]] = []
     @Published private(set) var gameState: String = ""
+    @Published private(set) var isCurrentPlayerAlive: Bool = true
+    @Published private(set) var shouldShowSpectatorBadge: Bool = false
     
     var rows: Int {
         _engine.rows
@@ -68,7 +73,12 @@ final class GameplayViewModelImpl: GameplayViewModel {
     private func setupBindings() {
         _engine.$players
             .receive(on: DispatchQueue.main)
-            .assign(to: &$players)
+            .sink { [weak self] newPlayers in
+                guard let self = self else { return }
+                self.players = newPlayers
+                self.updateSpectatorState(players: newPlayers)
+            }
+            .store(in: &cancellables)
         
         _engine.$bombs
             .receive(on: DispatchQueue.main)
@@ -81,6 +91,17 @@ final class GameplayViewModelImpl: GameplayViewModel {
         _engine.$gameState
             .receive(on: DispatchQueue.main)
             .assign(to: &$gameState)
+    }
+    
+    private func updateSpectatorState(players: [PlayerModel]) {
+        let myId = _engine.myPlayerId
+        let currentPlayer = players.first(where: { $0.id == myId })
+        let isAlive = currentPlayer?.alive ?? true
+        let aliveCount = players.filter { $0.alive }.count
+        let totalPlayers = players.count
+        
+        self.isCurrentPlayerAlive = isAlive
+        self.shouldShowSpectatorBadge = !isAlive && aliveCount >= 2 && totalPlayers > 2
     }
 }
 

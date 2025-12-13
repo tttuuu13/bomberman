@@ -113,6 +113,9 @@ class Game:
         self.original_map = [list(row) for row in map_layout]
         self.map = [list(row) for row in self.original_map]
         
+        # Очищаем зону 3x3 вокруг каждого спавна от разрушаемых блоков
+        self._clear_spawn_zones()
+        
         self.bombs = []
         self.state = "WAITING"
         self.winner, self.game_over_time, self.round_start_time = None, None, None
@@ -132,6 +135,25 @@ class Game:
 
     def _find_start_positions(self):
         return [(x, y) for y, row in enumerate(self.original_map) for x, tile in enumerate(row) if tile == 'p']
+
+    def _clear_spawn_zones(self):
+        """Очищает зону 3x3 вокруг каждого спавна от разрушаемых блоков."""
+        spawn_positions = self._find_start_positions()
+        
+        for spawn_x, spawn_y in spawn_positions:
+            # Проходим по квадрату 3x3 вокруг спавна
+            for dy in range(-1, 2):
+                for dx in range(-1, 2):
+                    x, y = spawn_x + dx, spawn_y + dy
+                    
+                    # Проверка границ карты
+                    if 0 <= x < GRID_WIDTH and 0 <= y < GRID_HEIGHT:
+                        # Заменяем разрушаемые блоки на пустое пространство
+                        if self.map[y][x] == '.':
+                            self.map[y][x] = ' '
+                            self.original_map[y][x] = ' '
+        
+        print(f"--- Очищены зоны спавна для {len(spawn_positions)} точек ---")
 
     def add_player(self, player_id, player_name):
         all_starts = self._find_start_positions()

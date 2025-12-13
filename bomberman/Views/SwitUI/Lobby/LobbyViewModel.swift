@@ -5,6 +5,8 @@ import Foundation
 protocol LobbyViewModel: ObservableObject {
     var players: [PlayerModel] { get }
     var myPlayerId: String? { get }
+    var engine: GameEngine { get }
+    var isReconnecting: Bool { get }
     
     func setReady()
 }
@@ -14,7 +16,7 @@ final class LobbyViewModelImpl: LobbyViewModel {
     // MARK: - Init
     
     init(engine: GameEngine) {
-        self.engine = engine
+        self._engine = engine
         
         setupBindings()
     }
@@ -27,19 +29,27 @@ final class LobbyViewModelImpl: LobbyViewModel {
         engine.myPlayerId
     }
     
+    var engine: GameEngine {
+        _engine
+    }
+    
+    var isReconnecting: Bool {
+        engine.isReconnecting
+    }
+    
     func setReady() {
-        engine.setReady()
+        _engine.setReady()
     }
     
     // MARK: - Private Properties
     
-    private let engine: GameEngine
+    private let _engine: GameEngine
     private var cancellables = Set<AnyCancellable>()
     
     // MARK: - Private Methods
     
     private func setupBindings() {
-        engine.$players
+        _engine.$players
             .receive(on: DispatchQueue.main)
             .assign(to: &$players)
     }
